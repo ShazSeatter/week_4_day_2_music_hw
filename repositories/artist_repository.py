@@ -2,17 +2,19 @@ from db.run_sql import run_sql
 from models.artist import Artist
 from models.album import Album
 
+# setting up basic CRUD functionality 
+
 def save(artist):
-    sql = """ INSERT INTO artists name
-    VALUES %s
-    RETURNING id
+    sql = """ INSERT INTO artists (name)
+    VALUES (%s)
+    RETURNING *
     """
     values = [artist.name]
-    print(values)
     results = run_sql(sql, values)
     id = results[0]['id']
     artist.id = id
     return artist
+
 
 def select_all():
     artists = []
@@ -56,6 +58,11 @@ def albums(artist):
 
     for row in results:
         album = Album(row['title'], row['genre'], artist, row['id'])
-
         albums.append(album)
+    
     return albums
+
+def update(artist):
+    sql = "UPDATE artists SET (name) = (%s) WHERE id = %s"
+    values = [artist.name, artist.id]
+    run_sql(sql, values)
